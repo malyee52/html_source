@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기획서 (UM) - 2D 타워 디펜스</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .nav-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .nav-back:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        
+        /* 토글(Details) 스타일링 */
+        details {
+            background-color: #fdfdfd;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+        details[open] {
+            border-color: #3498db;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.1);
+        }
+        summary {
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            outline: none;
+            list-style: none; /* 기본 화살표 숨기기 (일부 브라우저) */
+            position: relative;
+        }
+        summary::-webkit-details-marker {
+            display: none; /* 사파리/크롬 화살표 숨기기 */
+        }
+        /* 커스텀 화살표 아이콘 */
+        summary::after {
+            content: '▼';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #94a3b8;
+            transition: transform 0.2s;
+        }
+        details[open] summary::after {
+            transform: translateY(-50%) rotate(180deg);
+            color: #3498db;
+        }
+        summary:hover {
+            background-color: #f1f5f9;
+            border-radius: 8px;
+        }
+        details[open] summary:hover {
+            border-radius: 8px 8px 0 0;
+        }
+        
+        /* 토글 내부 콘텐츠 및 이미지 스타일링 */
+        .toggle-content {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            background-color: #ffffff;
+            border-radius: 0 0 8px 8px;
+            text-align: center; /* 이미지 중앙 정렬 */
+        }
+        .toggle-content p {
+            text-align: left;
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .doc-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="nav-back">⬅ 메인 화면으로 돌아가기</a>
+    
+    <h1>2D 타워 디펜스 게임 기획서</h1>
+
+    <details>
+        <summary>01. 프로젝트 개요 및 목적</summary>
+        <div class="toggle-content">
+            <p>※ 프로젝트의 개발 배경, 타겟 독자 및 핵심 재미 요소에 대한 기획 내용입니다.</p>
+            <img src="image/1" alt="프로젝트 개요 및 목적" class="doc-image" onerror="this.style.display='none'; this.after('이미지 파일(image/1)을 찾을 수 없습니다.');">
+        </div>
+    </details>
+
+    <details>
+        <summary>02. 게임 코어 루프 및 시스템 흐름도</summary>
+        <div class="toggle-content">
+            <p>※ 배치, 전투, 웨이브 진행, 보상 획득으로 이어지는 핵심 게임 사이클 구조입니다.</p>
+            <img src="image/2" alt="게임 코어 루프 및 시스템 흐름도" class="doc-image" onerror="this.style.display='none'; this.after('이미지 파일(image/2)을 찾을 수 없습니다.');">
+        </div>
+    </details>
+
+    <details>
+        <summary>03. 씬(Scene) 구조 및 네비게이션 설계</summary>
+        <div class="toggle-content">
+            <p>※ 타이틀, 로비, 스테이지 선택, 인게임 전투 등 총 9개 씬의 전환 흐름도입니다.</p>
+            <img src="image/3" alt="씬 구조 및 네비게이션 설계" class="doc-image" onerror="this.style.display='none'; this.after('이미지 파일(image/3)을 찾을 수 없습니다.');">
+        </div>
+    </details>
+
+    <details>
+        <summary>04. 유닛 및 타워 그리드 배치 시스템</summary>
+        <div class="toggle-content">
+            <p>※ 타일 그리드 기반의 유닛 스폰, 중복 배치 방지 및 드래그 앤 드롭 이동 조작 기획입니다.</p>
+            <img src="image/4" alt="유닛 및 타워 그리드 배치 시스템" class="doc-image" onerror="this.style.display='none'; this.after('이미지 파일(image/4)을 찾을 수 없습니다.');">
+        </div>
+    </details>
+
+    <details>
+        <summary>05. 적(Enemy) 생성 및 웨이브 메커니즘</summary>
+        <div class="toggle-content">
+            <p>※ Waypoint 추적 이동 경로 및 라운드별 적 스폰 규칙 정의서입니다.</p>
+            <img src="image/5" alt="적 생성 및 웨이브 메커니즘" class="doc-image" onerror="this.style.display='none'; this.after('이미지 파일(image/5)을 찾을 수 없습니다.');">
+        </div>
+    </details>
+
+    <details>
+        <summary>06. 성장 요소: 증강 및 모루 선택 UI 기획</summary>
+        <div class="toggle-content">
+            <p>※ 웨이브 클리어 시 제공되는 3지선다 형태의 카드 보상 선택 UI 명세입니다.</p>
+            <img src="image/6" alt="성장 요소: 증강 및 모루 선택 UI 기획" class="doc-image" onerror="this.style.display='none'; this.after('이미지 파일(image/6)을 찾을 수 없습니다.');">
+        </div>
+    </details>
+
+    <details>
+        <summary>07. 인게임 수치 데이터 매니지먼트 (CSV)</summary>
+        <div class="toggle-content">
+            <p>※ 외부 CSV 데이터 시트(9개) 구조와 유닛/적 능력치 연동 설계 구조입니다.</p>
+            <img src="image/7" alt="인게임 수치 데이터 매니지먼트 (CSV)" class="doc-image" onerror="this.style.display='none'; this.after('이미지 파일(image/7)을 찾을 수 없습니다.');">
+        </div>
+    </details>
+
+    <details>
+        <summary>08. 시스템 UI 및 설정창(일시정지)</summary>
+        <div class="toggle-content">
+            <p>※ 게임 진행 제어, 옵션 조절 및 로비 복귀 기능이 포함된 팝업 UI 설계입니다.</p>
+            <img src="image/8" alt="시스템 UI 및 설정창" class="doc-image" onerror="this.style.display='none'; this.after('이미지 파일(image/8)을 찾을 수 없습니다.');">
+        </div>
+    </details>
+
+</div>
+
+</body>
+</html>

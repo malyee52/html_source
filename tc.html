@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트케이스 (TC) - 2D 타워 디펜스</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .nav-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .nav-back:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 20px;
+            border-left: 5px solid #3498db;
+            padding-left: 10px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 10px;
+            background-color: #eef2f7;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        p, li {
+            line-height: 1.6;
+        }
+        .summary-box {
+            background-color: #ebf5fb;
+            border-left: 5px solid #2980b9;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        /* 슬라이드(컨텐츠 전환) 제어 스타일 */
+        .slide-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2c3e50;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            color: white;
+        }
+        .slide-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .slide-btn:hover {
+            background-color: #2980b9;
+        }
+        .slide-btn:disabled {
+            background-color: #7f8c8d;
+            cursor: not-allowed;
+        }
+        .slide-page-info {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        /* 각 슬라이드 섹션 숨김/보임 처리 */
+        .tc-slide {
+            display: none;
+        }
+        .tc-slide.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 테이블 기본 스타일 유지 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0 30px 0;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f4f8;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fbfd;
+        }
+        .priority-1 { color: #e74c3c; font-weight: bold; text-align: center; }
+        .tc-id { font-weight: bold; color: #2c3e50; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="nav-back">⬅ 메인 화면으로 돌아가기</a>
+    
+    <h1>2D 타워 디펜스 게임 테스트 케이스</h1>
+
+    <div class="slide-controls">
+        <button class="slide-btn" id="prevBtn" onclick="changeSlide(-1)">◀ 이전 항목</button>
+        <span class="slide-page-info" id="pageInfo">1 / 12</span>
+        <button class="slide-btn" id="nextBtn" onclick="changeSlide(1)">다음 항목 ▶</button>
+    </div>
+
+    <div class="tc-slide active">
+        <h2>1. 발표용 요약 및 개요</h2>
+        <div class="summary-box">
+            <strong>[발표 요약]</strong><br>
+            본 프로젝트에서는 유닛 배치, 사거리 표시, 드래그 이동, 적 공격, 웨이브 진행, 판매, 증강 선택, 설정창과 같은 핵심 기능을 중심으로 테스트 케이스를 작성했습니다.<br><br>
+            특히 타워 디펜스 장르 특성상 배치 가능 여부, 공격 범위, 적 이동 경로, 웨이브 종료 판정이 게임 플레이에 직접적인 영향을 주기 때문에 우선순위가 높은 테스트 항목으로 선정했습니다.
+        </div>
+        <p>본 문서는 Unity 기반 2D 타워 디펜스 게임 프로젝트의 핵심 기능을 검증하기 위한 문서입니다. (Unity 6.3 LTS, 씬 9개, 스크립트 50개+, CSV 9개 기반)</p>
+    </div>
+
+    <div class="tc-slide">
+        <h2>2. 핵심 우선순위 TC</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 80px;">우선순위</th>
+                    <th style="width: 100px;">TC ID</th>
+                    <th>테스트 항목</th>
+                    <th>선정 이유</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="priority-1">1</td><td class="tc-id">TC-005</td><td>배치 가능 칸에 유닛 배치</td><td>타워 디펜스의 기본 플레이 기능</td></tr>
+                <tr><td class="priority-1">2</td><td class="tc-id">TC-007</td><td>이미 유닛이 있는 칸에 중복 배치 방지</td><td>배치 시스템 오류 방지</td></tr>
+                <tr><td class="priority-1">3</td><td class="tc-id">TC-011</td><td>유닛 클릭 시 사거리 표시</td><td>플레이어 전략 판단에 필요</td></tr>
+                <tr><td class="priority-1">4</td><td class="tc-id">TC-014</td><td>유닛 드래그 이동</td><td>전투 중 진형 조정 기능</td></tr>
+                <tr><td class="priority-1">5</td><td class="tc-id">TC-018</td><td>적이 사거리 안에 진입 시 공격</td><td>전투 핵심 로직 검증</td></tr>
+                <tr><td class="priority-1">6</td><td class="tc-id">TC-021</td><td>적 HP 0 이하 시 제거</td><td>전투 결과 처리 검증</td></tr>
+                <tr><td class="priority-1">7</td><td class="tc-id">TC-025</td><td>적 목적지 도달 시 라이프 감소</td><td>패배 조건과 연결</td></tr>
+                <tr><td class="priority-1">8</td><td class="tc-id">TC-027</td><td>유닛 판매</td><td>자원 회수 및 전략 변경 기능</td></tr>
+                <tr><td class="priority-1">9</td><td class="tc-id">TC-031</td><td>증강 선택 UI 출력</td><td>보상 및 성장 시스템 검증</td></tr>
+                <tr><td class="priority-1">10</td><td class="tc-id">TC-039</td><td>일시정지 적용</td><td>게임 진행 제어 기능 검증</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.1 씬 전환 TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-001</td><td>타이틀 화면에서 메인 씬 이동</td><td>게임 실행 후 타이틀 화면 진입</td><td>화면 클릭 또는 아무 키 입력</td><td>메인 또는 로비 씬으로 정상 전환된다</td></tr>
+                <tr><td class="tc-id">TC-002</td><td>로비에서 게임 씬 이동</td><td>로비 화면 진입</td><td>게임 시작 버튼 클릭</td><td>게임 씬으로 정상 전환된다</td></tr>
+                <tr><td class="tc-id">TC-003</td><td>게임 씬에서 로비 복귀</td><td>게임 씬 진입</td><td>설정창 열기 → 로비 버튼 클릭</td><td>로비 씬으로 정상 이동한다</td></tr>
+                <tr><td class="tc-id">TC-004</td><td>씬 재진입 시 데이터 초기화</td><td>게임 씬 1회 플레이 후 로비 복귀</td><td>다시 게임 시작</td><td>이전 전투 데이터가 남지 않고 새 게임으로 시작된다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.2 유닛 배치 TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-005</td><td>배치 가능 칸에 유닛 배치</td><td>게임 씬 진입, 재화 보유</td><td>배치 가능한 그리드 클릭</td><td>해당 칸에 유닛이 생성된다</td></tr>
+                <tr><td class="tc-id">TC-006</td><td>배치 불가능 영역 클릭</td><td>게임 씬 진입</td><td>배치 구역 외 영역 클릭</td><td>유닛이 생성되지 않는다</td></tr>
+                <tr><td class="tc-id">TC-007</td><td>이미 유닛이 있는 칸에 중복 배치</td><td>유닛 1개 배치 완료</td><td>같은 칸에 다시 배치 시도</td><td>중복 배치되지 않는다</td></tr>
+                <tr><td class="tc-id">TC-008</td><td>재화 부족 상태에서 배치</td><td>보유 재화가 유닛 비용보다 낮음</td><td>유닛 배치 시도</td><td>배치되지 않고 재화도 차감되지 않는다</td></tr>
+                <tr><td class="tc-id">TC-009</td><td>배치 후 재화 차감</td><td>재화 보유 상태</td><td>유닛 배치</td><td>유닛 비용만큼 재화가 감소한다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.3 유닛 선택 및 사거리 표시 TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-010</td><td>유닛 클릭 시 선택 상태 적용</td><td>유닛 배치 완료</td><td>배치된 유닛 클릭</td><td>유닛이 선택 상태가 된다</td></tr>
+                <tr><td class="tc-id">TC-011</td><td>유닛 클릭 시 사거리 표시</td><td>유닛 배치 완료</td><td>유닛 클릭</td><td>유닛 중심 기준 붉은색 원형 사거리가 표시된다</td></tr>
+                <tr><td class="tc-id">TC-012</td><td>다른 유닛 선택 시 사거리 갱신</td><td>유닛 2개 배치 완료</td><td>A 유닛 클릭 후 B 유닛 클릭</td><td>B 유닛 중심으로 사거리 표시가 변경된다</td></tr>
+                <tr><td class="tc-id">TC-013</td><td>빈 공간 클릭 시 선택 해제</td><td>유닛 선택 상태</td><td>빈 공간 클릭</td><td>선택 상태와 사거리 표시가 해제된다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.4 유닛 이동 및 드래그 TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-014</td><td>유닛 드래그 이동</td><td>유닛 선택 상태</td><td>유닛을 다른 빈 배치 칸으로 드래그</td><td>해당 칸으로 유닛이 이동한다</td></tr>
+                <tr><td class="tc-id">TC-015</td><td>배치 불가 영역으로 드래그</td><td>유닛 선택 상태</td><td>배치 구역 밖으로 드래그 후 놓기</td><td>유닛이 원래 위치로 돌아간다</td></tr>
+                <tr><td class="tc-id">TC-016</td><td>이미 유닛이 있는 칸으로 이동</td><td>유닛 2개 배치 완료</td><td>A 유닛을 B 유닛 칸으로 드래그</td><td>이동되지 않고 원래 위치가 유지된다</td></tr>
+                <tr><td class="tc-id">TC-017</td><td>이동 후 사거리 위치 갱신</td><td>유닛 이동 완료</td><td>이동된 유닛 클릭</td><td>변경된 위치를 중심으로 사거리가 표시된다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.5 유닛 공격 TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-018</td><td>적이 사거리 안에 진입 시 공격</td><td>유닛 배치 완료, 적 스폰</td><td>적이 유닛 사거리 안으로 이동</td><td>유닛이 적을 자동 공격한다</td></tr>
+                <tr><td class="tc-id">TC-019</td><td>적이 사거리 밖에 있을 때 미공격</td><td>유닛 배치 완료</td><td>적이 사거리 밖에 위치</td><td>유닛이 공격하지 않는다</td></tr>
+                <tr><td class="tc-id">TC-020</td><td>공격 적중 시 적 HP 감소</td><td>유닛 공격 발생</td><td>적 HP 확인</td><td>공격력만큼 적 HP가 감소한다</td></tr>
+                <tr><td class="tc-id">TC-021</td><td>적 HP 0 이하 시 제거</td><td>적 HP를 0 이하로 감소</td><td>공격 진행</td><td>적 오브젝트가 제거된다</td></tr>
+                <tr><td class="tc-id">TC-022</td><td>사거리 내 적이 여러 명일 때 타겟 지정</td><td>적 여러 명이 사거리 진입</td><td>전투 진행</td><td>설정된 타겟 우선순위에 따라 하나의 적을 공격한다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.6 적 이동 및 웨이브 TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-023</td><td>웨이브 시작 시 적 스폰</td><td>게임 씬 진입</td><td>웨이브 시작</td><td>설정된 적이 생성된다</td></tr>
+                <tr><td class="tc-id">TC-024</td><td>적 경로 이동</td><td>적 스폰 완료</td><td>적 이동 관찰</td><td>적이 지정된 경로를 따라 이동한다</td></tr>
+                <tr><td class="tc-id">TC-025</td><td>적이 목적지 도달 시 라이프 감소</td><td>적이 끝 지점 도달</td><td>라이프 수치 확인</td><td>플레이어 라이프가 감소한다</td></tr>
+                <tr><td class="tc-id">TC-026</td><td>웨이브 종료 판정</td><td>웨이브 내 모든 적 제거</td><td>전투 진행</td><td>다음 웨이브 또는 보상 단계로 전환된다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.7 판매 기능 TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-027</td><td>유닛 판매</td><td>유닛 선택 상태</td><td>판매 버튼 클릭</td><td>유닛이 제거된다</td></tr>
+                <tr><td class="tc-id">TC-028</td><td>판매 시 재화 반환</td><td>유닛 선택 상태</td><td>판매 버튼 클릭</td><td>설정된 판매 금액만큼 재화가 증가한다</td></tr>
+                <tr><td class="tc-id">TC-029</td><td>유닛 미선택 상태에서 판매 버튼 클릭</td><td>선택된 유닛 없음</td><td>판매 버튼 클릭</td><td>오류 없이 아무 동작도 하지 않는다</td></tr>
+                <tr><td class="tc-id">TC-030</td><td>판매 후 해당 칸 재배치 가능 여부</td><td>유닛 판매 완료</td><td>같은 칸에 새 유닛 배치</td><td>정상 배치된다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.8 증강 및 모루 선택 UI TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-031</td><td>증강 선택 UI 출력</td><td>보상 단계 진입</td><td>화면 확인</td><td>3개의 직사각형 선택지가 표시된다</td></tr>
+                <tr><td class="tc-id">TC-032</td><td>증강 선택 적용</td><td>증강 UI 출력 상태</td><td>선택지 1개 클릭</td><td>해당 증강 효과가 적용된다</td></tr>
+                <tr><td class="tc-id">TC-033</td><td>선택 후 UI 닫힘</td><td>증강 선택 완료</td><td>화면 확인</td><td>선택 UI가 사라진다</td></tr>
+                <tr><td class="tc-id">TC-034</td><td>중복 선택 방지</td><td>증강 선택 직후</td><td>다른 선택지 추가 클릭</td><td>추가 선택이 적용되지 않는다</td></tr>
+                <tr><td class="tc-id">TC-035</td><td>모루 선택 UI 출력</td><td>모루 단계 진입</td><td>화면 확인</td><td>3개의 직사각형 선택지가 표시된다</td></tr>
+                <tr><td class="tc-id">TC-036</td><td>모루 선택 적용</td><td>모루 UI 출력 상태</td><td>선택지 1개 클릭</td><td>선택한 효과가 정상 적용된다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.9 설정창 및 일시정지 TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-037</td><td>게임 씬 설정창 열기</td><td>게임 씬 진입</td><td>설정 버튼 클릭</td><td>설정창이 표시된다</td></tr>
+                <tr><td class="tc-id">TC-038</td><td>설정창 닫기</td><td>설정창 표시 상태</td><td>닫기 버튼 클릭</td><td>설정창이 닫힌다</td></tr>
+                <tr><td class="tc-id">TC-039</td><td>일시정지 적용</td><td>전투 진행 중</td><td>설정창 또는 일시정지 버튼 클릭</td><td>게임 진행이 멈춘다</td></tr>
+                <tr><td class="tc-id">TC-040</td><td>일시정지 해제</td><td>일시정지 상태</td><td>재개 버튼 클릭</td><td>게임 진행이 다시 시작된다</td></tr>
+                <tr><td class="tc-id">TC-041</td><td>일시정지 중 적 이동 정지</td><td>적 이동 중 일시정지</td><td>적 위치 확인</td><td>적이 이동하지 않는다</td></tr>
+                <tr><td class="tc-id">TC-042</td><td>일시정지 중 유닛 공격 정지</td><td>유닛 공격 중 일시정지</td><td>공격 여부 확인</td><td>유닛 공격이 중단된다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tc-slide">
+        <h2>3. 상세 테스트 케이스</h2>
+        <h3>3.10 CSV 데이터 TC</h3>
+        <table>
+            <thead>
+                <tr><th style="width: 90px;">TC ID</th><th>테스트 항목</th><th>사전 조건</th><th>테스트 절차</th><th>기대 결과</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="tc-id">TC-043</td><td>유닛 CSV 데이터 로드</td><td>게임 실행</td><td>유닛 데이터 확인</td><td>CSV에 등록된 유닛 정보가 정상 반영된다</td></tr>
+                <tr><td class="tc-id">TC-044</td><td>적 CSV 데이터 로드</td><td>게임 실행</td><td>적 정보 확인</td><td>CSV에 등록된 적 HP, 속도 등이 정상 반영된다</td></tr>
+                <tr><td class="tc-id">TC-045</td><td>잘못된 CSV 값 처리</td><td>비정상 값 입력</td><td>게임 실행</td><td>게임이 강제 종료되지 않고 예외 처리가 된다</td></tr>
+                <tr><td class="tc-id">TC-046</td><td>누락 데이터 처리</td><td>CSV 일부 값 삭제</td><td>게임 실행</td><td>기본값 적용 또는 오류 로그가 출력된다</td></tr>
+                <tr><td class="tc-id">TC-047</td><td>밸런스 수치 반영</td><td>CSV 수치 변경</td><td>게임 재실행</td><td>변경된 수치가 게임에 반영된다</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    let currentIdx = 0;
+    const slides = document.querySelectorAll('.tc-slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageInfo = document.getElementById('pageInfo');
+
+    function updateSlide() {
+        // 모든 슬라이드 숨기기 및 현재 슬라이드 표시
+        slides.forEach((slide, idx) => {
+            if(idx === currentIdx) {
+                slide.classList.add('active');
+            } else {
+                slide.classList.remove('active');
+            }
+        });
+
+        // 페이지 정보 텍스트 변경
+        pageInfo.textContent = `${currentIdx + 1} / ${slides.length}`;
+
+        // 버튼 활성화/비활성화 제어
+        prevBtn.disabled = (currentIdx === 0);
+        nextBtn.disabled = (currentIdx === slides.length - 1);
+    }
+
+    function changeSlide(direction) {
+        currentIdx += direction;
+        // 범위 제한 안전장치
+        if (currentIdx < 0) currentIdx = 0;
+        if (currentIdx >= slides.length) currentIdx = slides.length - 1;
+        
+        updateSlide();
+        // 슬라이드 전환 시 페이지 최상단으로 스크롤 이동
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 키보드 방향키 제어 추가
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') changeSlide(-1);
+        if (e.key === 'ArrowRight') changeSlide(1);
+    });
+
+    // 초기 상태 반영
+    updateSlide();
+</script>
+
+</body>
+</html>

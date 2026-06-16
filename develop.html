@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D 타워 디펜스 게임 개발일지 Presentation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Pretendard:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f1115 0%, #161920 100%);
+            --card-bg: rgba(30, 34, 45, 0.7);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
+            
+            /* 유형별 메인 테마 컬러 */
+            --color-dev: #6366f1;
+            --color-bal: #f59e0b;
+            --color-bug: #ef4444;
+            
+            /* 로그 태그 컬러 */
+            --tag-new: #10b981;
+            --tag-mod: #3b82f6;
+            --tag-bug: #f43f5e;
+            --tag-bal: #eab308;
+            --tag-doc: #a855f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 슬라이드 외곽 컨테이너 */
+        .slider-wrapper {
+            position: relative;
+            width: 90%;
+            max-width: 1080px;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 개별 슬라이드 설정 */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 활성화된 슬라이드 애니메이션 */
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* 상단 고정 헤더 영역 */
+        .slide-header {
+            flex-shrink: 0; /* 절대 줄어들지 않음 */
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 20px;
+        }
+
+        .title-area {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .phase-badge {
+            align-self: flex-start;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .phase-dev { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
+        .phase-bal { background: rgba(245, 158, 11, 0.15); color: #fde047; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .phase-bug { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .slide-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #e5e7eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--text-sub);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* 중앙 가변 스크롤 내용 영역 - 절대 겹치지 않도록 유연하게 설정 */
+        .slide-content {
+            flex: 1; 
+            overflow-y: auto; /* 내용이 많으면 내부 스크롤 제공 */
+            padding-right: 10px;
+            margin-bottom: 20px; /* 하단 컨트롤바와의 마진 분리 */
+        }
+
+        .log-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .log-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            transition: background 0.2s ease;
+        }
+
+        .log-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        /* 내부 태그 라벨 */
+        .tag {
+            flex-shrink: 0;
+            width: 64px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 4px 0;
+            border-radius: 6px;
+        }
+        .tag-new { color: var(--tag-new); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .tag-mod { color: var(--tag-mod); background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .tag-bug { color: var(--tag-bug); background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); }
+        .tag-bal { color: var(--tag-bal); background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.2); }
+        .tag-doc { color: var(--tag-doc); background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); }
+
+        .text-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .log-text {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .note {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 4px 10px;
+            border-radius: 6px;
+            align-self: flex-start;
+            margin-top: 4px;
+        }
+
+        /* 하단 네비게이션 컨트롤러 */
+        .controls {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-top: 25px;
+            z-index: 100;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.01);
+            color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.02);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* 안내 단축키 탑 배너 */
+        .shortcut-tip {
+            position: fixed;
+            top: 24px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 6px 16px;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+        }
+
+        /* 스크롤바 세련되게 커스텀 */
+        .slide-content::-webkit-scrollbar { width: 6px; }
+        .slide-content::-webkit-scrollbar-track { background: transparent; }
+        .slide-content::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        .slide-content::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+    </style>
+</head>
+<body>
+
+    <div class="shortcut-tip">⌨️ 이동: 키보드 방향키(←, →), Space Bar</div>
+
+    <div class="slider-wrapper" id="slider">
+        </div>
+
+    <div class="controls">
+        <button class="btn" id="prevBtn">← 이전</button>
+        <span class="page-info" id="pageInfo">01 / 00</span>
+        <button class="btn" id="nextBtn">다음 →</button>
+    </div>
+
+    <script>
+        // 데이터 정의 구조 생성
+        const devLogData = [
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "1주차", date: "03/03 ~ 03/09",
+                logs: [
+                    { type: "new", text: "Unity 6.3 LTS 프로젝트 생성 및 SPUM 캐릭터 에셋 임포트, 기본 씬(로비/게임/게임오버) 골격 구성" },
+                    { type: "new", text: "CharacterData 구조 설계 및 PlayerSpawner 기본 소환 시스템 구현" },
+                    { type: "new", text: "PlayerAttack / EnemyMove / EnemyHealth / PathManager 등 기본 전투 시스템 구현" },
+                    { type: "new", text: "캐릭터 합성(Merge) 및 판매 시스템 v1 구현" },
+                    { type: "new", text: "CSVLoader 구현 및 로비 영구 업그레이드 시스템(UpgradeManager / UpgradeUI) v1 구현" },
+                    { type: "new", text: "보스 시스템 구현", note: "boss.csv 데이터 기반 BossManager 작성, 10웨이브마다 보스 소환" }
+                ]
+            },
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "2주차", date: "03/10 ~ 03/16",
+                logs: [
+                    { type: "new", text: "보스 우선 타겟팅 및 isBoss 플래그 처리 구현" },
+                    { type: "new", text: "배속 시스템(SpeedManager) 구현 - 1배 / 2배 속도 전환" },
+                    { type: "new", text: "패시브 'SpecialCoinOnKillChance' 추가 (처치 시 특수코인 획득 확률)" },
+                    { type: "new", text: "적 방어력(defense) 시스템 구현" },
+                    { type: "new", text: "데미지 텍스트(DamageText) 구현 - 피격 시 데미지 숫자 표시" },
+                    { type: "mod", text: "CSV 구조 개편 - enemies.csv를 rounds.csv로 분리하여 라운드별 적 스탯 관리" }
+                ]
+            },
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "3주차", date: "03/17 ~ 03/23",
+                logs: [
+                    { type: "new", text: "boss.csv 신규 생성 및 CSVLoader 연동" },
+                    { type: "bug", text: "upgradeCost CSV 파싱 오류 수정" },
+                    { type: "new", text: "캐릭터 티어별 오라 파티클 적용" },
+                    { type: "new", text: "사거리 표시(RangeIndicator) 작업 착수 (미완성)" },
+                    { type: "mod", text: "1차 코드 최적화 진행 (중복 로직 정리)" },
+                    { type: "new", text: "RangeIndicator 완성", note: "characters.csv의 attackRange 기반 사거리 표시" }
+                ]
+            },
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "4주차", date: "03/24 ~ 03/30",
+                logs: [
+                    { type: "new", text: "StageSelectScene 구현 (스테이지 선택 화면)" },
+                    { type: "new", text: "스테이지 클리어 판정 로직 구현" },
+                    { type: "new", text: "보스 등장 시 Warning 이미지 점멸 처리 (isBoss 플래그 연동)" },
+                    { type: "bug", text: "캐릭터 2배 스폰(double-spawn) 버그 수정" },
+                    { type: "bug", text: "판매 후 소환 버튼이 비활성화되는 버그 수정" },
+                    { type: "bug", text: "보스 처치 직후 일반 적이 몰려 나오는 현상 수정" }
+                ]
+            },
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "5주차", date: "03/31 ~ 04/06",
+                logs: [
+                    { type: "new", text: "characters.csv col[9] attackHitDelay 컬럼 추가" },
+                    { type: "new", text: "Tier2~5 패시브 CSV 데이터 작성" },
+                    { type: "mod", text: "PlayerPrefs 키 구조 확정" },
+                    { type: "new", text: "패시브 UI 한글화 작업, 캐릭터 티어 해금 강화 조건 점검" },
+                    { type: "mod", text: "spawnCost.GetActualSpawnCost() 정리 및 CSV Parse 예외처리 보강" }
+                ]
+            },
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "6주차", date: "04/07 ~ 04/13",
+                logs: [
+                    { type: "new", text: "Tier5_4 '천벌(메테오)' 마나 스킬 이펙트 구현", note: "화면 중앙 발생, 적 존재 시에만 피해 적용" },
+                    { type: "mod", text: "PlayerAttack.ManaSkill_Tier5_4() 로직 업데이트" },
+                    { type: "bug", text: "Tier4_4 'SpecialCoinOnKillChance' 패시브의 PassiveManager switch case 누락 확인", note: "차기 확인 필요" },
+                    { type: "new", text: "증강(Augment) 시스템 v1 구현", note: "보스 처치 시 3종 중 1개 선택, 기존 14종 작성" },
+                    { type: "new", text: "모루(Anvil) 시스템 v1 구현", note: "6종 (공격력/공속/배치제한/적제한/보스타임/방어관통)" }
+                ]
+            },
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "7주차", date: "04/14 ~ 04/20",
+                logs: [
+                    { type: "bug", text: "모루 EnemyLimit 효과 리셋 버그 수정" },
+                    { type: "bug", text: "오라 파티클 회전 값 오류 수정" },
+                    { type: "bug", text: "UnlockedTier 기본값 5 → 1 수정" },
+                    { type: "bug", text: "증강/모루 선택 후 배속(Speed)이 유지되지 않는 문제 수정", note: "CurrentSpeed 변수 연동" },
+                    { type: "bug", text: "Tier5_1 스킬 장판 생성 위치 오류 수정" }
+                ]
+            },
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "8주차", date: "04/21 ~ 04/27",
+                logs: [
+                    { type: "bug", text: "특수몬스터-모루 버튼 충돌 문제 수정" },
+                    { type: "bug", text: "신규 소환 유닛에 증강 보너스가 적용되지 않는 문제 수정" },
+                    { type: "bug", text: "AllEnemySpeedDown / AllEnemyDefenseDown이 신규 스폰 적에 미적용되는 문제 수정" },
+                    { type: "mod", text: "attackHitDelay 계산식을 attackCooldown × 0.3f 로 변경" },
+                    { type: "mod", text: "2차 코드 최적화 진행" }
+                ]
+            },
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "9주차", date: "04/28 ~ 05/04",
+                logs: [
+                    { type: "mod", text: "마나 시스템 전면 개편", note: "전역 ManaManager 제거, PlayerAttack 인스턴스별 마나 관리로 전환" },
+                    { type: "mod", text: "MergeManager 재구성", note: "Tier5 전용 마나 스킬 버튼 4개 구조로 변경" },
+                    { type: "bug", text: "투사체가 죽은 타겟의 마지막 위치로 발사되도록 수정 (저장 위치 발사)" },
+                    { type: "bug", text: "스킬 버튼 사용 시 코인 이중 차감 버그 수정" },
+                    { type: "bug", text: "모루 스탯 중복 적용 버그 수정" }
+                ]
+            },
+            {
+                phase: "개발 (10주)", phaseClass: "phase-dev", title: "10주차", date: "05/05 ~ 05/11",
+                logs: [
+                    { type: "mod", text: "공격속도 계산 방식 변경", note: "쿨다운 방식에서 백분율 합산(rate) 방식으로 전환 (spdMult 제거)" },
+                    { type: "new", text: "game_settings.csv 신규 생성 - Inspector 노출 값 이전" },
+                    { type: "new", text: "special_monster.csv 신규 생성 (스테이지별 데이터)" },
+                    { type: "new", text: "anvil_settings.csv 신규 생성 (스테이지별 min/max)" },
+                    { type: "doc", text: "CSV 구조 정리 PDF, Unity 적용 가이드, Scripts.zip 제작" }
+                ]
+            },
+            {
+                phase: "밸런스 및 버그수정 (6주)", phaseClass: "phase-bal", title: "11주차", date: "05/12 ~ 05/18",
+                logs: [
+                    { type: "new", text: "TitleScene / TitleManager 구현", note: "클릭 시 LobbyScene 전환, 타이틀 텍스트 점멸, 첫 프레임 입력 무시" },
+                    { type: "new", text: "SceneTransitionManager 구현 - TransitionConfig 배열 기반 씬 전환 효과" },
+                    { type: "new", text: "SettingsManager 구현 - 로비 ESC 설정창 (GameScene PauseManager와 분리)" },
+                    { type: "new", text: "DemoEndScene / DemoEndUI 구현", note: "Stage1 Round30 보스 최초 처치 시 1회 안내" },
+                    { type: "new", text: "게임오버씬 종료 버튼 구현" },
+                    { type: "new", text: "로비 업그레이드 UI에 현재 배치 캐릭터 수 표시 버튼 추가" }
+                ]
+            },
+            {
+                phase: "밸런스 및 버그수정 (6주)", phaseClass: "phase-bal", title: "12주차", date: "05/19 ~ 05/25",
+                logs: [
+                    { type: "new", text: "CompendiumScene 구현", note: "캐릭터 도감 (티어 필터, hover 툴팁, 미해금 '???')" },
+                    { type: "new", text: "DebugManager 구현", note: "버그판/일반판 토글, 증강 즉시 적용, OnDestroy 자동 복원 (백업키 적용)" },
+                    { type: "new", text: "StageMapManager 구현 - 스테이지별 배경/웨이포인트 변경" },
+                    { type: "new", text: "characters.csv attackType 컬럼 추가 (Melee / Bow / Magic)" },
+                    { type: "new", text: "AudioManager 확장 - BGM 씬별 자동 전환, 공격 타입별 SFX 3종 분기" },
+                    { type: "mod", text: "히트/스킬 이펙트 프리팹 연결 작업" }
+                ]
+            },
+            {
+                phase: "밸런스 및 버그수정 (6주)", phaseClass: "phase-bal", title: "13주차", date: "05/26 ~ 06/01",
+                logs: [
+                    { type: "new", text: "StageClearScene / StageClearUI 구현", note: "클리어 시간/라운드/SP 표시, 로비/재도전/다음스테이지 3버튼" },
+                    { type: "mod", text: "special_monster.csv 구조 개선", note: "stage 필드 추가 및 GetSpecialMonsterData 룩업 개선" },
+                    { type: "mod", text: "적 카운트 UI - 현재 적 수가 한도의 80% 도달 시 텍스트 적색 강조" },
+                    { type: "bug", text: "적 카운트가 0 미만으로 내려가지 않도록 수정 (Mathf.Max 적용)" },
+                    { type: "mod", text: "캐릭터 합성 결과 최대 티어를 MAX_MERGE_RESULT_TIER 상수로 관리" },
+                    { type: "mod", text: "판매가에 sellPriceMultiplier 적용 ('처음부터다시' 증강 연동)" }
+                ]
+            },
+            {
+                phase: "밸런스 및 버그수정 (6주)", phaseClass: "phase-bal", title: "14주차", date: "06/02 ~ 06/08",
+                logs: [
+                    { type: "new", text: "증강 6종 추가 (28종 → 34종)", note: "물량공세/부러진검날/잊힌검자루/잊혀진영웅의검/저주받은보석/처음부터다시" },
+                    { type: "new", text: "세트 효과 '잊혀진영웅의검' 구현", note: "부러진검날+잊힌검자루 보유 시 두 효과 각 +30% 증폭" },
+                    { type: "new", text: "증강 '혼돈의장화(ChaosBoots)' 추가 및 최종 제외 결정", note: "augmentSprites 배열 크기 34로 확정" },
+                    { type: "bug", text: "증강 '저주받은보석(CursedGem)' off-by-one 오류 수정 (초기 카운트 3 → 4)" },
+                    { type: "bug", text: "캐릭터 적용 사거리 최소값 보장 (Mathf.Max 적용)" }
+                ]
+            },
+            {
+                phase: "밸런스 및 버그수정 (6주)", phaseClass: "phase-bal", title: "15주차", date: "06/09 ~ 06/15",
+                logs: [
+                    { type: "bal", text: "캐릭터 티어별 스탯 밸런스 조정", note: "공격력/공격속도/사거리 수치 미세 조정 (characters.csv)" },
+                    { type: "bal", text: "Tier5 마나 스킬 데미지 및 마나 충전량 밸런스 조정" },
+                    { type: "bal", text: "라운드별 적 체력/방어력 및 보스 스탯 밸런스 조정 (rounds.csv / boss.csv)" },
+                    { type: "bal", text: "특수몬스터 killCount 단계별 난이도 곡선 조정 (special_monster.csv)" },
+                    { type: "bal", text: "패시브 17종 발동 확률 및 효과 수치 밸런스 조정 (passives.csv)" },
+                    { type: "bal", text: "증강 34종 및 모루 6종 효과 수치 밸런스 조정 (anvil_settings.csv)" }
+                ]
+            },
+            {
+                phase: "밸런스 및 버그수정 (6주)", phaseClass: "phase-bal", title: "16주차", date: "06/16 ~ 06/23",
+                logs: [
+                    { type: "doc", text: "게임 기획서 PDF / 개발일지 Excel 작성", note: "핵심 구현 100% 완료, 이후 버그수정 단계 전환" },
+                    { type: "bug", text: "Projectile.cs 원거리 투사체 증강 효과 미적용 버그 수정", note: "날카로운칼날/얼음조각/전장의지배자/약점간파 효과 DealDamageWithDelay 연동" },
+                    { type: "bug", text: "BossManager.SpawnBoss() 보스 방어력 감소 미적용 버그 수정", note: "적 방어력 감소 3중 합산값이 보스에 미적용되는 문제 해결" },
+                    { type: "bug", text: "MergeManager.ExecuteSell() 판매 후 패시브 재계산 누락 수정", note: "RecalculatePassives() 호출 추가" },
+                    { type: "bug", text: "FateDice(운명의주사위) 라운드 감지 방식 개선", note: "OnNewRoundStart() 직접 호출 방식으로 변경" },
+                    { type: "bug", text: "AoeStunEveryNHits(패시브17) 보너스 미적용 버그 수정", note: "패시브공명 및 두사람최강 보너스 반영" }
+                ]
+            },
+            {
+                phase: "미해결 버그 목록", phaseClass: "phase-bug", title: "우선 조치 필요", date: "종합 리포트",
+                logs: [
+                    { type: "bug", text: "Projectile.cs: 일부 증강 효과(날카로운칼날, 얼음조각 등)가 투사체에 미적용", note: "권장: DealDamageWithDelay 경로 확인 및 연동" },
+                    { type: "bug", text: "BossManager.SpawnBoss(): 적 방어력 감소 3중 합산 값이 보스에게 미적용", note: "권장: 보스 스폰 시 합산 방어력 감소값 전달 필요" },
+                    { type: "bug", text: "MergeManager.ExecuteSell(): 유닛 판매 처리 후 패시브 재계산(RecalculatePassives) 누락", note: "권장: 판매 로직 마지막에 재계산 호출 추가" },
+                    { type: "bug", text: "FateDice (운명의주사위): 라운드 전환 감지가 불안정함", note: "권장: OnNewRoundStart() 직접 호출 방식으로 개선" },
+                    { type: "bug", text: "AoeStunEveryNHits (패시브17): 패시브공명 및 두사람최강 보너스가 미적용", note: "권장: 확률/배율 적용 로직에 두 보너스 반영" }
+                ]
+            }
+        ];
+
+        const tagMap = {
+            new: { class: "tag-new", label: "신규" },
+            mod: { class: "tag-mod", label: "개선" },
+            bug: { class: "tag-bug", label: "버그" },
+            bal: { class: "tag-bal", label: "밸런스" },
+            doc: { class: "tag-doc", label: "문서" }
+        };
+
+        const slider = document.getElementById('slider');
+        let currentSlide = 0;
+
+        // 슬라이드 DOM 빌드
+        function createSlides() {
+            devLogData.forEach((data, index) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${index === 0 ? 'active' : ''}`;
+                
+                let logItemsHtml = data.logs.map(log => {
+                    const tag = tagMap[log.type];
+                    return `
+                        <li class="log-item">
+                            <div class="tag ${tag.class}">${tag.label}</div>
+                            <div class="text-container">
+                                <span class="log-text">${log.text}</span>
+                                ${log.note ? `<span class="note">💡 ${log.note}</span>` : ''}
+                            </div>
+                        </li>
+                    `;
+                }).join('');
+
+                slide.innerHTML = `
+                    <div class="slide-header">
+                        <div class="title-area">
+                            <div><span class="phase-badge ${data.phaseClass}">${data.phase}</span></div>
+                            <h2 class="slide-title">${data.title}</h2>
+                        </div>
+                        <span class="slide-date">${data.date}</span>
+                    </div>
+                    <div class="slide-content">
+                        <ul class="log-list">${logItemsHtml}</ul>
+                    </div>
+                `;
+                slider.appendChild(slide);
+            });
+        }
+
+        // 제어 상태 및 UI 업데이트
+        function updateSlide() {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+                // 슬라이드가 전환될 때마다 내용 영역의 스크롤 위치를 맨 위로 리셋
+                if(index === currentSlide) {
+                    const content = slide.querySelector('.slide-content');
+                    if(content) content.scrollTop = 0;
+                }
+            });
+            
+            // 페이지 넘버 가독성 포맷 (01, 02 .. 형태)
+            const pad = (n) => n < 10 ? '0' + n : n;
+            document.getElementById('pageInfo').innerText = `${pad(currentSlide + 1)} / ${pad(devLogData.length)}`;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === devLogData.length - 1;
+        }
+
+        function next() {
+            if (currentSlide < devLogData.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prev() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // 컴포넌트 이벤트 연결
+        document.getElementById('nextBtn').addEventListener('click', next);
+        document.getElementById('prevBtn').addEventListener('click', prev);
+
+        // 키보드 인터랙션 바인딩
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault(); // 스페이스바 브라우저 기본 스크롤 내림 방지
+                next();
+            } else if (e.key === 'ArrowLeft') {
+                prev();
+            }
+        });
+
+        // 렌더링 시작
+        createSlides();
+        updateSlide();
+    </script>
+</body>
+</html>
